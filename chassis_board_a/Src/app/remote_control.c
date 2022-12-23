@@ -101,7 +101,7 @@ void set_motor_voltage(uint8_t id_range, int16_t v1, int16_t v2, int16_t v3, int
     CAN_TxHeaderTypeDef tx_header;
     uint8_t tx_data[8];
 
-    tx_header.StdId = (id_range == 0) ? (0x200) : (0x1ff); //如果id_range==0则等于0x1ff,id_range==1则等于0x2ff（ID号）
+    tx_header.StdId = (id_range == 0) ? (0x200) : (0x1ff); //如果id_range==0则等于0x200,id_range==1则等于0x1ff（ID号）
     tx_header.IDE = CAN_ID_STD;                            //标准帧
     tx_header.RTR = CAN_RTR_DATA;                          //数据帧
     tx_header.DLC = 8;                                     //发送数据长度（字节）
@@ -118,6 +118,7 @@ void set_motor_voltage(uint8_t id_range, int16_t v1, int16_t v2, int16_t v3, int
 }
 void set_motor_voltage1(uint8_t id_range, int16_t v1, int16_t v2, int16_t v3, int16_t v4)
 {
+    //6020电机输出
     CAN_TxHeaderTypeDef tx_header;
     uint8_t tx_data[8];
 

@@ -226,7 +226,7 @@ void gimbal_pitch_task(void const * argument)
       {
         if(rc_ctrl.rc.ch[1]>=364&&rc_ctrl.rc.ch[1]<=1684)
         {
-          target_speed[6] = (rc_ctrl.rc.ch[1] - 1024) / 660 * 15;
+          target_speed[6] = -((rc_ctrl.rc.ch[1] - 1024) / 660 * 5);
           motor_info[6].set_voltage = pid_calc(&motor_pid[6], target_speed[6], motor_info[6].rotor_speed);
         }
       }

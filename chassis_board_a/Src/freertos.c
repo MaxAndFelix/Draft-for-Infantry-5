@@ -160,7 +160,7 @@ void StartDefaultTask(void const * argument)
 void communication_task(void const * argument)
 {
   /* USER CODE BEGIN communication_task */
-  //板间通讯在can接收回调函数中实�? HAL_CAN_RxFifo0MsgPendingCallback
+  //板间通讯在can接收回调函数中实现 HAL_CAN_RxFifo0MsgPendingCallback
   /* Infinite loop */
   motor_info[0].set_voltage = 0;
   motor_info[1].set_voltage = 0;
@@ -191,7 +191,7 @@ void gimbal_yaw_task(void const * argument)
   /* USER CODE BEGIN gimbal_yaw_task */
   /* Infinite loop */
   pid_init(&motor_pid[4], 40, 3, 0, 30000, 30000); // init pid parameter, kp=40, ki=3, kd=0, output limit = 30000    
-  for(;;)//�?单的yaw轴随rc通道0转动
+  for(;;)//yaw轴随rc通道0转动
   {
     if(can_flag==1)
     {
@@ -210,12 +210,11 @@ void gimbal_yaw_task(void const * argument)
       {
         if(rc_ctrl.rc.ch[0]>=364&&rc_ctrl.rc.ch[0]<=1684)
         {
-          target_speed[4] = (rc_ctrl.rc.ch[0] - 1024) / 660 * 15;
+          target_speed[4] = -((rc_ctrl.rc.ch[0] - 1024) / 660 * 30); //60为转速 即 60rpm
           motor_info[4].set_voltage = pid_calc(&motor_pid[4], target_speed[4], motor_info[4].rotor_speed);
         }
       }
       set_motor_voltage1(1, motor_info[4].set_voltage, motor_info[5].set_voltage, motor_info[6].set_voltage, 0);
-      //set_motor_voltage1(1, 30, 30, 30, 0);
     }
     osDelay(1);
   }
