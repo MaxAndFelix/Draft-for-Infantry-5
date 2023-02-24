@@ -210,7 +210,7 @@ void gimbal_yaw_task(void const * argument)
       {
         if(rc_ctrl.rc.ch[0]>=364&&rc_ctrl.rc.ch[0]<=1684)
         {
-          target_speed[4] = -((rc_ctrl.rc.ch[0] - 1024) / 660 * 30); //60为转速 即 60rpm
+          target_speed[4] = -((rc_ctrl.rc.ch[0] - 1024) / 660 * 20); //60为转速 即 60rpm
           motor_info[4].set_voltage = pid_calc(&motor_pid[4], target_speed[4], motor_info[4].rotor_speed);
         }
       }
@@ -235,7 +235,7 @@ void chassis_task(void const * argument)
   /* Infinite loop */
   for (uint8_t i = 0; i < 4; i++) //先将pid赋初�?
   {
-    pid_init(&motor_pid[i], 40, 3, 0, 16384, 16384); // init pid parameter, kp=40, ki=3, kd=0, output limit = 16384
+    pid_init(&motor_pid[i], 30, 0, 0, 16384, 16384); // init pid parameter, kp=40, ki=3, kd=0, output limit = 16384
   }                                                   // P高了就会抖动，返回�?�溢出，超过80电机有移动就会抖动，超过100直接�?�?(除非你设定的速度�?>=320)
 
   for (;;)
@@ -276,30 +276,30 @@ void chassis_task(void const * argument)
         {
           target_curl = 0;
         }
-        target_curl = target_curl * 9158;
+        target_curl = target_curl * 16384;
         int16_t target_curl_int = target_curl;
 
         r = sqrt((rc_ctrl.rc.ch[3] - 1024) * (rc_ctrl.rc.ch[3] - 1024) + (rc_ctrl.rc.ch[2] - 1024) * (rc_ctrl.rc.ch[2] - 1024));
         sin_sita = (rc_ctrl.rc.ch[3] - 1024) / r;
         cos_sita = (rc_ctrl.rc.ch[2] - 1024) / r;
-        target_v = (r / 660) * 9158;
+        target_v = (r / 660) * 16384 ;
 
         if (target_curl == 0)
         {
-          target_speed[3] = (0.707 * target_v * (sin_sita - cos_sita)) / 2;
-          target_speed[1] = -(0.707 * target_v * (sin_sita - cos_sita)) / 2;
-          target_speed[0] = (0.707 * target_v * (sin_sita + cos_sita)) / 2;
-          target_speed[2] = -(0.707 * target_v * (sin_sita + cos_sita)) / 2; //保护不旋转只移动时的底盘功率上限
+          target_speed[0] = (0.707 * target_v * (sin_sita - cos_sita));
+          target_speed[1] = -(0.707 * target_v * (sin_sita + cos_sita));
+          target_speed[2] = -(0.707 * target_v * (sin_sita - cos_sita));
+          target_speed[3] = (0.707 * target_v * (sin_sita + cos_sita)); //保护不旋转只移动时的底盘功率上限
         }
         else
         {
           target_int1 = (0.707 * target_v * (sin_sita - cos_sita)) / 2; //经测验，double和float类型可以做乘除，做加减会出现NAN,因此转换成int做加减法，注意不要使用uint（无符号型）
           target_int2 = (0.707 * target_v * (sin_sita + cos_sita)) / 2;
 
-          target_speed[3] = (target_int1 - target_curl_int) / 2;
-          target_speed[1] = (-target_int1 - target_curl_int) / 2;
-          target_speed[0] = (target_int2 - target_curl_int) / 2;
-          target_speed[2] = (-target_int2 - target_curl_int) / 2; //不�?2会越�?
+          target_speed[0] = (target_int1 - target_curl_int) / 2;
+          target_speed[1] = (-target_int2 - target_curl_int) / 2;
+          target_speed[2] = (-target_int1 - target_curl_int) / 2;
+          target_speed[3] = (target_int2 - target_curl_int) / 2; //不�?2会越�?
         }
       }
     }

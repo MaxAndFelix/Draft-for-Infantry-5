@@ -53,7 +53,7 @@ osThreadId defaultTaskHandle;
 osThreadId weopenHandle;
 osThreadId can_6020_pitchHandle;
 osThreadId communicationHandle;
-osThreadId myTask05Handle;
+osThreadId insHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -64,7 +64,7 @@ void StartDefaultTask(void const * argument);
 void weopen_task(void const * argument);
 void gimbal_pitch_task(void const * argument);
 void communication_task(void const * argument);
-void StartTask05(void const * argument);
+void insTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -127,9 +127,9 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(communication, communication_task, osPriorityIdle, 0, 128);
   communicationHandle = osThreadCreate(osThread(communication), NULL);
 
-  /* definition and creation of myTask05 */
-  osThreadDef(myTask05, StartTask05, osPriorityIdle, 0, 128);
-  myTask05Handle = osThreadCreate(osThread(myTask05), NULL);
+  /* definition and creation of ins */
+  osThreadDef(ins, insTask, osPriorityIdle, 0, 128);
+  insHandle = osThreadCreate(osThread(ins), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -175,19 +175,27 @@ void weopen_task(void const * argument)
   {
     if (rc_ctrl.rc.s[1] == 2)
     {
-      target_speed[0] = 300;
-      target_speed[1] = 300;
+      while (motor_info[6].torque_current!=16864)
+      {
+        target_speed[2] = -40;
+        motor_info[2].set_voltage = pid_calc(&motor_pid[2], target_speed[2], motor_info[2].rotor_speed);  //调节反转转速
+        set_motor_voltage(0, motor_info[0].set_voltage, motor_info[1].set_voltage, motor_info[2].set_voltage,0);
+      }
+      target_speed[0] = 2290;
+      target_speed[1] = -2290;
+      target_speed[2] = 40;
       motor_info[0].set_voltage = pid_calc(&motor_pid[0], target_speed[0], motor_info[0].rotor_speed);
       motor_info[1].set_voltage = pid_calc(&motor_pid[1], target_speed[1], motor_info[1].rotor_speed);
-      //target_speed[2] = 300;
+      motor_info[2].set_voltage = pid_calc(&motor_pid[2], target_speed[2], motor_info[2].rotor_speed);
       set_motor_voltage(0, motor_info[0].set_voltage, motor_info[1].set_voltage, motor_info[2].set_voltage,0);
     }else
     {
       target_speed[0] = 0;
       target_speed[1] = 0;
+      target_speed[2] = 0;
       motor_info[0].set_voltage = pid_calc(&motor_pid[0], target_speed[0], motor_info[0].rotor_speed);
       motor_info[1].set_voltage = pid_calc(&motor_pid[1], target_speed[1], motor_info[1].rotor_speed);
-      //target_speed[2] = 300;
+      motor_info[2].set_voltage = pid_calc(&motor_pid[2], target_speed[2], motor_info[2].rotor_speed);
       set_motor_voltage(0, motor_info[0].set_voltage, motor_info[1].set_voltage, motor_info[2].set_voltage,0);
     }
     osDelay(1);
@@ -226,7 +234,7 @@ void gimbal_pitch_task(void const * argument)
       {
         if(rc_ctrl.rc.ch[1]>=364&&rc_ctrl.rc.ch[1]<=1684)
         {
-          target_speed[6] = -((rc_ctrl.rc.ch[1] - 1024) / 660 * 5);
+          target_speed[6] = -((rc_ctrl.rc.ch[1] - 1024) / 660 * 8);
           motor_info[6].set_voltage = pid_calc(&motor_pid[6], target_speed[6], motor_info[6].rotor_speed);
         }
       }
@@ -267,22 +275,22 @@ void communication_task(void const * argument)
   /* USER CODE END communication_task */
 }
 
-/* USER CODE BEGIN Header_StartTask05 */
+/* USER CODE BEGIN Header_insTask */
 /**
-* @brief Function implementing the myTask05 thread.
+* @brief Function implementing the ins thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartTask05 */
-void StartTask05(void const * argument)
+/* USER CODE END Header_insTask */
+void insTask(void const * argument)
 {
-  /* USER CODE BEGIN StartTask05 */
+  /* USER CODE BEGIN insTask */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END StartTask05 */
+  /* USER CODE END insTask */
 }
 
 /* Private application code --------------------------------------------------*/
