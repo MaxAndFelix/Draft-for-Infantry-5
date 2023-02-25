@@ -2,6 +2,13 @@
   "files.associations": {
     "bsp_usart.h": "c",
     "BSP_RC.H": "cpp",
-    "remote_control.h": "c"
+    "remote_control.h": "c",
+    "mahonyahrs.h": "c",
+    "bsp_imu_pwm.h": "c",
+    "pid.h": "c",
+    "main.h": "c",
+    "stm32f4xx_hal.h": "c",
+    "stm32f4xx_hal_conf.h": "c",
+    "struct_typedef.h": "c"
   }
 }

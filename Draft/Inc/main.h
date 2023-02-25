@@ -33,12 +33,12 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 typedef struct
 {
-    uint16_t can_id;		//IDºÅ
-    int16_t  set_voltage;		//·¢ËÍÐÅÏ¢
-    uint16_t rotor_angle;		//ÏÖÔÚµÄ½Ç¶È
-    int16_t  rotor_speed;		//ÏÖÔÚµÄ×ªËÙ
-    int16_t  torque_current;		//Êµ¼Ê×ª¾ØµçÁ÷
-    uint8_t  temp;		//µç»úÎÂ¶È
+    uint16_t can_id;		//IDï¿½ï¿½
+    int16_t  set_voltage;		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+    uint16_t rotor_angle;		//ï¿½ï¿½ï¿½ÚµÄ½Ç¶ï¿½
+    int16_t  rotor_speed;		//ï¿½ï¿½ï¿½Úµï¿½×ªï¿½ï¿½
+    int16_t  torque_current;		//Êµï¿½ï¿½×ªï¿½Øµï¿½ï¿½ï¿½
+    uint8_t  temp;		//ï¿½ï¿½ï¿½ï¿½Â¶ï¿?
 }moto_info_t;
 
 typedef struct _pid_struct_t
@@ -58,18 +58,18 @@ typedef struct _pid_struct_t
   float d_out;
   float output;
 }pid_struct_t;
-//ºê¶¨Òå
-#define MOTOR_MAX_NUM 7		//??´óÊý¾Ý×Ö½ÚÊý
-#define LIMIT_MIN_MAX(x,min,max) (x) = (((x)<=(min))?(min):(((x)>=(max))?(max):(x)))		//Ô½½çÔò¸³±ß½ç??
+//ï¿½ê¶¨ï¿½ï¿½
+#define MOTOR_MAX_NUM 7		//??ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½
+#define LIMIT_MIN_MAX(x,min,max) (x) = (((x)<=(min))?(min):(((x)>=(max))?(max):(x)))		//Ô½ï¿½ï¿½ï¿½ò¸³±ß½ï¿½??
 #define FEEDBACK_ID_BASE      0x201
 #define FEEDBACK_ID_BASE_6020 0x205
 #define CAN_CONTROL_ID_BASE   0x200
 #define CAN_CONTROL_ID_EXTEND 0x1ff
-//È«¾Ö±äÁ¿
+//È«ï¿½Ö±ï¿½ï¿½ï¿½
 extern uint16_t can_cnt_1;
 extern uint16_t can_cnt_2;
-extern float target_speed[7];//Êµ²â??´ó¿ÕÔØ×ª??320rpm
-extern moto_info_t motor_info[MOTOR_MAX_NUM];		//¸³Óè??´óµÄ7¸ö×Ö??
+extern float target_speed[7];//Êµï¿½ï¿½??ï¿½ï¿½ï¿½ï¿½ï¿½×???320rpm
+extern moto_info_t motor_info[MOTOR_MAX_NUM];		//ï¿½ï¿½ï¿½ï¿½??ï¿½ï¿½ï¿?7ï¿½ï¿½ï¿½ï¿½??
 extern pid_struct_t motor_pid[7];	
 extern uint8_t can_flag;
 extern double step; 
@@ -78,7 +78,7 @@ extern double sin_sita;
 extern double cos_sita;
 extern double target_v;
 extern int16_t target_int1;
-extern int16_t target_int2;//ÓÃÓÚµþ¼ÓÐý×ªºÍÖ±??
+extern int16_t target_int2;//ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Ö±??
 extern double target_curl;
 extern float yuntai_step;
 /* USER CODE END Includes */

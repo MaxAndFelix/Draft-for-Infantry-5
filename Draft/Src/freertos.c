@@ -64,7 +64,7 @@ void StartDefaultTask(void const * argument);
 void weopen_task(void const * argument);
 void gimbal_pitch_task(void const * argument);
 void communication_task(void const * argument);
-void insTask(void const * argument);
+void INS_Task(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -128,7 +128,7 @@ void MX_FREERTOS_Init(void) {
   communicationHandle = osThreadCreate(osThread(communication), NULL);
 
   /* definition and creation of ins */
-  osThreadDef(ins, insTask, osPriorityIdle, 0, 128);
+  osThreadDef(ins, INS_Task, osPriorityIdle, 0, 128);
   insHandle = osThreadCreate(osThread(ins), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -178,12 +178,12 @@ void weopen_task(void const * argument)
       while (motor_info[6].torque_current!=16864)
       {
         target_speed[2] = -40;
-        motor_info[2].set_voltage = pid_calc(&motor_pid[2], target_speed[2], motor_info[2].rotor_speed);  //µ÷½Ú·´×ª×ªËÙ
+        motor_info[2].set_voltage = pid_calc(&motor_pid[2], target_speed[2], motor_info[2].rotor_speed);  //ï¿½ï¿½ï¿½Ú·ï¿½×ª×ªï¿½ï¿½
         set_motor_voltage(0, motor_info[0].set_voltage, motor_info[1].set_voltage, motor_info[2].set_voltage,0);
       }
-      target_speed[0] = 2290;
-      target_speed[1] = -2290;
-      target_speed[2] = 40;
+      target_speed[0] = -5000;
+      target_speed[1] = 5000;
+      target_speed[2] = 300;
       motor_info[0].set_voltage = pid_calc(&motor_pid[0], target_speed[0], motor_info[0].rotor_speed);
       motor_info[1].set_voltage = pid_calc(&motor_pid[1], target_speed[1], motor_info[1].rotor_speed);
       motor_info[2].set_voltage = pid_calc(&motor_pid[2], target_speed[2], motor_info[2].rotor_speed);
@@ -219,9 +219,9 @@ void gimbal_pitch_task(void const * argument)
   {
     if(can_flag ==1)
     {
-      if (rc_ctrl.rc.ch[1] >= 974 && rc_ctrl.rc.ch[1] <= 1074) //»ØÖÐ
+      if (rc_ctrl.rc.ch[1] >= 974 && rc_ctrl.rc.ch[1] <= 1074) //ï¿½ï¿½ï¿½ï¿½
       {
-        if (motor_info[6].rotor_speed > 10 || motor_info[6].rotor_speed < -10) //¼õÕð(?)
+        if (motor_info[6].rotor_speed > 10 || motor_info[6].rotor_speed < -10) //ï¿½ï¿½ï¿½ï¿½(?)
         {
           target_speed[6] = 0;
           motor_info[6].set_voltage = pid_calc(&motor_pid[6], target_speed[6], motor_info[6].rotor_speed);
@@ -275,22 +275,22 @@ void communication_task(void const * argument)
   /* USER CODE END communication_task */
 }
 
-/* USER CODE BEGIN Header_insTask */
+/* USER CODE BEGIN Header_INS_Task */
 /**
 * @brief Function implementing the ins thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_insTask */
-void insTask(void const * argument)
+/* USER CODE END Header_INS_Task */
+__weak void INS_Task(void const * argument)
 {
-  /* USER CODE BEGIN insTask */
+  /* USER CODE BEGIN INS_Task */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END insTask */
+  /* USER CODE END INS_Task */
 }
 
 /* Private application code --------------------------------------------------*/
