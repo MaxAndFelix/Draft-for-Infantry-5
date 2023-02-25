@@ -167,6 +167,7 @@ void weopen_task(void const * argument)
 {
   /* USER CODE BEGIN weopen_task */
   /* Infinite loop */
+  int flag=0;
   for (uint8_t i = 0; i < 4; i++) 
   {
     pid_init(&motor_pid[i], 40, 3, 0, 30000, 30000); // init pid parameter, kp=40, ki=3, kd=0, output limit = 30000
@@ -175,21 +176,23 @@ void weopen_task(void const * argument)
   {
     if (rc_ctrl.rc.s[1] == 2)
     {
-      while (motor_info[6].torque_current!=16864)
+      /*while (motor_info[2].torque_current!=-16864&&flag==0)
       {
-        target_speed[2] = -40;
+        target_speed[2] = -50;
         motor_info[2].set_voltage = pid_calc(&motor_pid[2], target_speed[2], motor_info[2].rotor_speed);  //调节反转转速
         set_motor_voltage(0, motor_info[0].set_voltage, motor_info[1].set_voltage, motor_info[2].set_voltage,0);
-      }
-      target_speed[0] = 2290;
-      target_speed[1] = -2290;
-      target_speed[2] = 40;
+      }*/
+      flag=1;
+      target_speed[0] = -5000;
+      target_speed[1] = 5000;
+      target_speed[2] = 400;
       motor_info[0].set_voltage = pid_calc(&motor_pid[0], target_speed[0], motor_info[0].rotor_speed);
       motor_info[1].set_voltage = pid_calc(&motor_pid[1], target_speed[1], motor_info[1].rotor_speed);
       motor_info[2].set_voltage = pid_calc(&motor_pid[2], target_speed[2], motor_info[2].rotor_speed);
       set_motor_voltage(0, motor_info[0].set_voltage, motor_info[1].set_voltage, motor_info[2].set_voltage,0);
     }else
     {
+      flag=0;
       target_speed[0] = 0;
       target_speed[1] = 0;
       target_speed[2] = 0;
