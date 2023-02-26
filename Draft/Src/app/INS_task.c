@@ -32,10 +32,11 @@
 #include "bmi088driver.h"
 #include "ist8310driver.h"
 #include "pid.h"
-
+#include "bsp_usart.h"
 #include "MahonyAHRS.h"
 #include "math.h"
-
+#include <stdarg.h>
+#include <stdio.h>
 
 #define IMU_temp_PWM(pwm)  imu_pwm_set(pwm)                    //pwm����
 
@@ -183,10 +184,10 @@ void INS_Task(void const *pvParameters)
 
         AHRS_update(INS_quat, 0.001f, bmi088_real_data.gyro, bmi088_real_data.accel, ist8310_real_data.mag);
         get_angle(INS_quat, INS_angle + INS_YAW_ADDRESS_OFFSET, INS_angle + INS_PITCH_ADDRESS_OFFSET, INS_angle + INS_ROLL_ADDRESS_OFFSET);
-
-
     }
 }
+
+
 
 void AHRS_init(fp32 quat[4], fp32 accel[3], fp32 mag[3])
 {
@@ -206,8 +207,28 @@ void get_angle(fp32 q[4], fp32 *yaw, fp32 *pitch, fp32 *roll)
     *yaw = atan2f(2.0f*(q[0]*q[3]+q[1]*q[2]), 2.0f*(q[0]*q[0]+q[1]*q[1])-1.0f);
     *pitch = asinf(-2.0f*(q[1]*q[3]-q[0]*q[2]));
     *roll = atan2f(2.0f*(q[0]*q[1]+q[2]*q[3]),2.0f*(q[0]*q[0]+q[3]*q[3])-1.0f);
+    //usart串口打印roll pitch yaw
+    usart_printf("**********\r\n\
+    roll:%d\r\n\
+    pitch:%d\r\n\
+    yaw:%d\r\n\
+    **********\r\n",&roll,&pitch,&yaw);
 }
+void usart_printf(const char *fmt,...)
+{
+    static uint8_t tx_buf[256] = {0};
+    static va_list ap;
+    static uint16_t len;
+    va_start(ap, fmt);
 
+    //return length of string 
+    len = vsprintf((char *)tx_buf, fmt, ap);
+
+    va_end(ap);
+
+    usart1_tx_dma_enable(tx_buf, len);
+
+}
 /**
   * @brief          control the temperature of bmi088
   * @param[in]      temp: the temperature of bmi088
