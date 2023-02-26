@@ -227,9 +227,9 @@ bool_t bmi088_accel_self_test(void)
 
     //check commiunication is normal
     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
-    BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+    //BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
-    BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+    //BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
 
     // reset  bmi088 accel sensor and wait for > 50ms
     BMI088_accel_write_single_reg(BMI088_ACC_SOFTRESET, BMI088_ACC_SOFTRESET_VALUE);
@@ -237,9 +237,9 @@ bool_t bmi088_accel_self_test(void)
 
     //check commiunication is normal
     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
-    BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+    //BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
-    BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+    //BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
 
     if (res != BMI088_ACC_CHIP_ID_VALUE)
     {

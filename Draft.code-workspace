@@ -17,7 +17,9 @@
 			"stm32f4xx_hal_conf.h": "c",
 			"struct_typedef.h": "c",
 			"ins_task.h": "c",
-			"freertos.h": "c"
+			"freertos.h": "c",
+			"bsp_spi.h": "c",
+			"spi.h": "c"
 		}
 	}
 }

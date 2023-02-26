@@ -50,7 +50,7 @@
   * @param[in]      temp:bmi088���¶�
   * @retval         none
   */
-static void imu_temp_control(fp32 temp);
+// static void imu_temp_control(fp32 temp);
 
 /**
   * @brief          open the SPI DMA accord to the value of imu_update_flag
@@ -137,7 +137,7 @@ void INS_Task(void const *pvParameters)
 
     //get the handle of task
     //��ȡ��ǰ�������������?
-    INS_task_local_handler = xTaskGetHandle(pcTaskGetName(NULL));
+    // INS_task_local_handler = xTaskGetHandle(pcTaskGetName(NULL));
 
     //set spi frequency
     hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
@@ -156,9 +156,9 @@ void INS_Task(void const *pvParameters)
     {
         //wait spi DMA tansmit done
         //�ȴ�SPI DMA����
-        while (ulTaskNotifyTake(pdTRUE, portMAX_DELAY) != pdPASS)
-        {
-        }
+        // while (ulTaskNotifyTake(pdTRUE, portMAX_DELAY) != pdPASS)
+        // {
+        // }
 
 
         if(gyro_update_flag & (1 << IMU_NOTIFY_SHFITS))
@@ -177,7 +177,7 @@ void INS_Task(void const *pvParameters)
         {
             accel_temp_update_flag &= ~(1 << IMU_UPDATE_SHFITS);
             BMI088_temperature_read_over(accel_temp_dma_rx_buf + BMI088_ACCEL_RX_BUF_DATA_OFFSET, &bmi088_real_data.temp);
-            imu_temp_control(bmi088_real_data.temp);
+            // imu_temp_control(bmi088_real_data.temp);
         }
 
 
