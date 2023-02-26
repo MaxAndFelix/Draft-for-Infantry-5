@@ -9,7 +9,7 @@
 extern void BMI088_GPIO_init(void);
 extern void BMI088_com_init(void);
 extern void BMI088_delay_ms(uint16_t ms);
-extern void BMI088_delay_us(uint16_t us);
+void BMI088_delay_us(uint16_t us);
 
 #if defined(BMI088_USE_SPI)
 extern void BMI088_ACCEL_NS_L(void);

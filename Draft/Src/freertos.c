@@ -28,6 +28,7 @@
 #include "remote_control.h"
 #include "math.h"
 #include "PID.h"
+#include "INS_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -175,12 +176,12 @@ void weopen_task(void const * argument)
   {
     if (rc_ctrl.rc.s[1] == 2)
     {
-      while (motor_info[6].torque_current!=16864)
-      {
-        target_speed[2] = -40;
-        motor_info[2].set_voltage = pid_calc(&motor_pid[2], target_speed[2], motor_info[2].rotor_speed);  //���ڷ�תת��
-        set_motor_voltage(0, motor_info[0].set_voltage, motor_info[1].set_voltage, motor_info[2].set_voltage,0);
-      }
+      // while (motor_info[6].torque_current!=16864)
+      // {
+      //   target_speed[2] = -40;
+      //   motor_info[2].set_voltage = pid_calc(&motor_pid[2], target_speed[2], motor_info[2].rotor_speed);  //���ڷ�תת��
+      //   set_motor_voltage(0, motor_info[0].set_voltage, motor_info[1].set_voltage, motor_info[2].set_voltage,0);
+      // }
       target_speed[0] = -5000;
       target_speed[1] = 5000;
       target_speed[2] = 300;
