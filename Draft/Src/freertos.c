@@ -168,10 +168,9 @@ void weopen_task(void const * argument)
   /* USER CODE BEGIN weopen_task */
   /* Infinite loop */
   int flag=0;
-  for (uint8_t i = 0; i < 4; i++) 
-  {
-    pid_init(&motor_pid[i], 40, 3, 0, 30000, 30000); // init pid parameter, kp=40, ki=3, kd=0, output limit = 30000
-  }    
+  pid_init(&motor_pid[0], 50, 1, 0, 30000, 30000); 
+  pid_init(&motor_pid[1], 50, 1, 0, 30000, 30000); 
+  pid_init(&motor_pid[2], 10, 0.1, 0, 30000, 30000); 
   for(;;)
   {
     if (rc_ctrl.rc.s[1] == 2)
@@ -190,6 +189,7 @@ void weopen_task(void const * argument)
       motor_info[1].set_voltage = pid_calc(&motor_pid[1], target_speed[1], motor_info[1].rotor_speed);
       motor_info[2].set_voltage = pid_calc(&motor_pid[2], target_speed[2], motor_info[2].rotor_speed);
       set_motor_voltage(0, motor_info[0].set_voltage, motor_info[1].set_voltage, motor_info[2].set_voltage,0);
+      set_motor_voltage1(1,0, 0, 0, 0);
     }else
     {
       flag=0;
@@ -217,7 +217,7 @@ void gimbal_pitch_task(void const * argument)
 {
   /* USER CODE BEGIN gimbal_pitch_task */
   /* Infinite loop */
-  pid_init(&motor_pid[6], 40, 3, 0, 30000, 30000); // init pid parameter, kp=40, ki=3, kd=0, output limit = 30000  
+  pid_init(&motor_pid[6], 45, 1, 0, 30000, 30000); // init pid parameter, kp=40, ki=3, kd=0, output limit = 30000  
   for(;;)
   {
     if(can_flag ==1)
