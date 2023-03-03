@@ -1,0 +1,14 @@
+{
+    "name": "AHRS",
+    "version": "1.0.0",
+    "dependencies":
+    {
+        "STM32Cube Middleware-FreeRTOS": "*"
+    },
+    "build":
+    {
+        "extraScript": "import.py",
+        "srcDir": "source",
+        "includeDir": "include"
+    }
+}

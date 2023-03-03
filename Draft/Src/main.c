@@ -115,6 +115,7 @@ int main(void)
   MX_I2C3_Init();
   MX_TIM5_Init();
   MX_TIM10_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
   CAN_AlternateConfig();
   remote_control_init();

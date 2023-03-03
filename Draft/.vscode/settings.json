@@ -13,6 +13,9 @@
     "cmsis_os.h": "c",
     "info_proc.h": "c",
     "bsp_bmi088.h": "c",
-    "bsp_ist8310.h": "c"
+    "bsp_ist8310.h": "c",
+    "arm_math.h": "c",
+    "ahrs.h": "c",
+    "user_lib.h": "c"
   }
 }

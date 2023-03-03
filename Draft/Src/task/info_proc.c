@@ -1,5 +1,19 @@
 #include "info_proc.h"
 
+#define BMI088_BOARD_INSTALL_SPIN_MATRIX \
+    {0.0f, 1.0f, 0.0f},                  \
+        {-1.0f, 0.0f, 0.0f},             \
+    {                                    \
+        0.0f, 0.0f, 1.0f                 \
+    }
+
+#define IST8310_BOARD_INSTALL_SPIN_MATRIX \
+    {1.0f, 0.0f, 0.0f},                   \
+        {0.0f, 1.0f, 0.0f},               \
+    {                                     \
+        0.0f, 0.0f, 1.0f                  \
+    }
+
 static TaskHandle_t Info_proc_local_handler;
 
 uint8_t gyro_dma_rx_buf[SPI_DMA_GYRO_LENGHT];
@@ -16,15 +30,89 @@ volatile uint8_t accel_update_flag = 0;
 volatile uint8_t accel_temp_update_flag = 0;
 volatile uint8_t mag_update_flag = 0;
 volatile uint8_t imu_start_dma_flag = 0;
+
 BMI088_Real_Data_T bmi088_real_data;
+fp32 gyro_scale_factor[3][3] = {BMI088_BOARD_INSTALL_SPIN_MATRIX};
+fp32 gyro_offset[3];
+fp32 gyro_cali_offset[3];
+
+fp32 accel_scale_factor[3][3] = {BMI088_BOARD_INSTALL_SPIN_MATRIX};
+fp32 accel_offset[3];
+fp32 accel_cali_offset[3];
+
 IST8310_Real_Data_T ist8310_real_data;
+fp32 mag_scale_factor[3][3] = {IST8310_BOARD_INSTALL_SPIN_MATRIX};
+fp32 mag_offset[3];
+fp32 mag_cali_offset[3];
 
 static uint8_t first_temperate;
 static const fp32 imu_temp_PID[3] = {TEMPERATURE_PID_KP, TEMPERATURE_PID_KI, TEMPERATURE_PID_KD};
 static pid_type_def imu_temp_pid;
 
-fp32 INS_quat[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+static const float timing_time = 0.001f; // tast run time , unit s.任务运行的时间 单位 s
+
+// 加速度计低通滤波
+static fp32 accel_fliter_1[3] = {0.0f, 0.0f, 0.0f};
+static fp32 accel_fliter_2[3] = {0.0f, 0.0f, 0.0f};
+static fp32 accel_fliter_3[3] = {0.0f, 0.0f, 0.0f};
+static const fp32 fliter_num[3] = {1.929454039488895f, -0.93178349823448126f, 0.002329458745586203f};
+
+static fp32 INS_gyro[3] = {0.0f, 0.0f, 0.0f};
+static fp32 INS_accel[3] = {0.0f, 0.0f, 0.0f};
+static fp32 INS_mag[3] = {0.0f, 0.0f, 0.0f};
+static fp32 INS_quat[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 fp32 INS_angle[3] = {0.0f, 0.0f, 0.0f}; // euler angle, unit rad.欧拉角 单位 rad
+
+static void imu_cali_slove(fp32 gyro[3], fp32 accel[3], fp32 mag[3], BMI088_Real_Data_T *bmi088, IST8310_Real_Data_T *ist8310)
+{
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        gyro[i] = bmi088->gyro[0] * gyro_scale_factor[i][0] + bmi088->gyro[1] * gyro_scale_factor[i][1] + bmi088->gyro[2] * gyro_scale_factor[i][2] + gyro_offset[i];
+        accel[i] = bmi088->accel[0] * accel_scale_factor[i][0] + bmi088->accel[1] * accel_scale_factor[i][1] + bmi088->accel[2] * accel_scale_factor[i][2] + accel_offset[i];
+        mag[i] = ist8310->mag[0] * mag_scale_factor[i][0] + ist8310->mag[1] * mag_scale_factor[i][1] + ist8310->mag[2] * mag_scale_factor[i][2] + mag_offset[i];
+    }
+}
+
+void gyro_offset_calc(fp32 gyro_offset[3], fp32 gyro[3], uint16_t *offset_time_count)
+{
+    if (gyro_offset == NULL || gyro == NULL || offset_time_count == NULL)
+    {
+        return;
+    }
+
+    gyro_offset[0] = gyro_offset[0] - 0.0003f * gyro[0];
+    gyro_offset[1] = gyro_offset[1] - 0.0003f * gyro[1];
+    gyro_offset[2] = gyro_offset[2] - 0.0003f * gyro[2];
+    (*offset_time_count)++;
+}
+
+void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count)
+{
+    if (*time_count == 0)
+    {
+        gyro_offset[0] = gyro_cali_offset[0];
+        gyro_offset[1] = gyro_cali_offset[1];
+        gyro_offset[2] = gyro_cali_offset[2];
+    }
+    gyro_offset_calc(gyro_offset, INS_gyro, time_count);
+
+    cali_offset[0] = gyro_offset[0];
+    cali_offset[1] = gyro_offset[1];
+    cali_offset[2] = gyro_offset[2];
+    cali_scale[0] = 1.0f;
+    cali_scale[1] = 1.0f;
+    cali_scale[2] = 1.0f;
+}
+
+void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3])
+{
+    gyro_cali_offset[0] = cali_offset[0];
+    gyro_cali_offset[1] = cali_offset[1];
+    gyro_cali_offset[2] = cali_offset[2];
+    gyro_offset[0] = gyro_cali_offset[0];
+    gyro_offset[1] = gyro_cali_offset[1];
+    gyro_offset[2] = gyro_cali_offset[2];
+}
 
 void IMU_help_pwm_set(uint16_t pwm)
 {
@@ -122,9 +210,15 @@ void Info_Proc(void *argument)
         osDelay(100);
 
     BMI088_func_read(bmi088_real_data.gyro, bmi088_real_data.accel, &bmi088_real_data.temp);
+    imu_cali_slove(INS_gyro, INS_accel, INS_mag, &bmi088_real_data, &ist8310_real_data);
+
     pid_init(&imu_temp_pid, PID_POSITION, imu_temp_PID, TEMPERATURE_PID_MAX_OUT, TEMPERATURE_PID_MAX_IOUT);
 
     AHRS_help_init(INS_quat, bmi088_real_data.accel, ist8310_real_data.mag);
+
+    accel_fliter_1[0] = accel_fliter_2[0] = accel_fliter_3[0] = INS_accel[0];
+    accel_fliter_1[1] = accel_fliter_2[1] = accel_fliter_3[1] = INS_accel[1];
+    accel_fliter_1[2] = accel_fliter_2[2] = accel_fliter_3[2] = INS_accel[2];
 
     // get the handle of task
     Info_proc_local_handler = xTaskGetHandle(pcTaskGetName(NULL));
@@ -166,10 +260,27 @@ void Info_Proc(void *argument)
             IMU_help_temp_control(bmi088_real_data.temp);
         }
 
-        MahonyAHRSupdate(INS_quat,
-                         bmi088_real_data.gyro[0], bmi088_real_data.gyro[1], bmi088_real_data.gyro[2],
-                         bmi088_real_data.accel[0], bmi088_real_data.accel[1], bmi088_real_data.accel[2],
-                         ist8310_real_data.mag[0], ist8310_real_data.mag[1], ist8310_real_data.mag[2]);
+        // rotate and zero drift
+        imu_cali_slove(INS_gyro, INS_accel, INS_mag, &bmi088_real_data, &ist8310_real_data);
+
+        // 加速度计低通滤波
+        // accel low-pass filter
+        accel_fliter_1[0] = accel_fliter_2[0];
+        accel_fliter_2[0] = accel_fliter_3[0];
+
+        accel_fliter_3[0] = accel_fliter_2[0] * fliter_num[0] + accel_fliter_1[0] * fliter_num[1] + INS_accel[0] * fliter_num[2];
+
+        accel_fliter_1[1] = accel_fliter_2[1];
+        accel_fliter_2[1] = accel_fliter_3[1];
+
+        accel_fliter_3[1] = accel_fliter_2[1] * fliter_num[0] + accel_fliter_1[1] * fliter_num[1] + INS_accel[1] * fliter_num[2];
+
+        accel_fliter_1[2] = accel_fliter_2[2];
+        accel_fliter_2[2] = accel_fliter_3[2];
+
+        accel_fliter_3[2] = accel_fliter_2[2] * fliter_num[0] + accel_fliter_1[2] * fliter_num[1] + INS_accel[2] * fliter_num[2];
+
+        AHRS_update(INS_quat, timing_time, INS_gyro, accel_fliter_3, INS_mag);
 
         // yaw
         INS_angle[0] = atan2f(2.0f * (INS_quat[0] * INS_quat[3] + INS_quat[1] * INS_quat[2]),
@@ -179,6 +290,12 @@ void Info_Proc(void *argument)
         // roll
         INS_angle[2] = atan2f(2.0f * (INS_quat[0] * INS_quat[1] + INS_quat[2] * INS_quat[3]),
                               2.0f * (INS_quat[0] * INS_quat[0] + INS_quat[3] * INS_quat[3]) - 1.0f);
+        if (mag_update_flag &= 1 << IMU_DR_SHFITS)
+        {
+            mag_update_flag &= ~(1 << IMU_DR_SHFITS);
+            mag_update_flag |= (1 << IMU_SPI_SHFITS);
+            //            ist8310_read_mag(ist8310_real_data.mag);
+        }
     }
 }
 
@@ -261,4 +378,29 @@ void DMA2_Stream2_IRQHandler(void)
             __HAL_GPIO_EXTI_GENERATE_SWIT(GPIO_PIN_0);
         }
     }
+}
+
+const fp32 *get_INS_quat_point(void)
+{
+    return INS_quat;
+}
+
+const fp32 *get_INS_angle_point(void)
+{
+    return INS_angle;
+}
+
+const fp32 *get_gyro_data_point(void)
+{
+    return INS_gyro;
+}
+
+const fp32 *get_accel_data_point(void)
+{
+    return INS_accel;
+}
+
+const fp32 *get_mag_data_point(void)
+{
+    return INS_mag;
 }

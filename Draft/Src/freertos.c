@@ -54,37 +54,37 @@ static const fp32 motor_PID[3] = {40, 3, 0};
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+    .name = "defaultTask",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for weapon */
 osThreadId_t weaponHandle;
 const osThreadAttr_t weapon_attributes = {
-  .name = "weapon",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+    .name = "weapon",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for can_6020_pitch */
 osThreadId_t can_6020_pitchHandle;
 const osThreadAttr_t can_6020_pitch_attributes = {
-  .name = "can_6020_pitch",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+    .name = "can_6020_pitch",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityLow,
 };
 /* Definitions for communication */
 osThreadId_t communicationHandle;
 const osThreadAttr_t communication_attributes = {
-  .name = "communication",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+    .name = "communication",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityLow,
 };
 /* Definitions for info_proc */
 osThreadId_t info_procHandle;
 const osThreadAttr_t info_proc_attributes = {
-  .name = "info_proc",
-  .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityRealtime,
+    .name = "info_proc",
+    .stack_size = 1024 * 4,
+    .priority = (osPriority_t)osPriorityRealtime,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -101,11 +101,12 @@ void Info_Proc(void *argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
-  * @brief  FreeRTOS initialization
-  * @param  None
-  * @retval None
-  */
-void MX_FREERTOS_Init(void) {
+ * @brief  FreeRTOS initialization
+ * @param  None
+ * @retval None
+ */
+void MX_FREERTOS_Init(void)
+{
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -149,7 +150,6 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
-
 }
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -164,9 +164,20 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN StartDefaultTask */
   // HAL_GPIO_WritePin(GPIOH, GPIO_PIN_11, GPIO_PIN_SET);
   /* Infinite loop */
+
   for (;;)
   {
-    osDelay(1);
+    if (imu_start_dma_flag)
+    {
+      UART_func_printf("0:");
+      UART_func_printfloat(INS_angle[0]);
+      UART_func_printf(" 1:");
+      UART_func_printfloat(INS_angle[1]);
+      UART_func_printf(" 2:");
+      UART_func_printfloat(INS_angle[2]);
+      UART_func_printf("\n");
+      osDelay(1000);
+    }
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -303,7 +314,7 @@ __weak void Info_Proc(void *argument)
 {
   /* USER CODE BEGIN Info_Proc */
   /* Infinite loop */
-  for(;;)
+  for (;;)
   {
     osDelay(1);
   }
@@ -314,4 +325,3 @@ __weak void Info_Proc(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
-

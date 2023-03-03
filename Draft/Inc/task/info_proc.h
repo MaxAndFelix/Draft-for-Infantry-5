@@ -10,8 +10,8 @@
 #include "bsp_spi.h"
 
 #include "pid.h"
-#include "MahonyAHRS.h"
-#include "math.h"
+
+#include "AHRS.h"
 
 #define SPI_DMA_GYRO_LENGHT 8
 #define SPI_DMA_ACCEL_LENGHT 9
@@ -50,6 +50,7 @@
 #define INS_MAG_Y_ADDRESS_OFFSET 1
 #define INS_MAG_Z_ADDRESS_OFFSET 2
 
+extern volatile uint8_t imu_start_dma_flag;
 extern SPI_HandleTypeDef hspi1;
 extern BMI088_Real_Data_T bmi088_real_data;
 extern IST8310_Real_Data_T ist8310_real_data;
@@ -57,6 +58,11 @@ extern fp32 INS_angle[3];
 
 extern TIM_HandleTypeDef htim10;
 extern void Info_Proc(void *argument); // imu任务, 初始化 bmi088, ist8310, 计算欧拉角
+extern const fp32 *get_INS_quat_point(void);
+extern const fp32 *get_INS_angle_point(void);
+extern const fp32 *get_gyro_data_point(void);
+extern const fp32 *get_accel_data_point(void);
+extern const fp32 *get_mag_data_point(void);
 
 // extern void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count);
 // extern void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3]);
