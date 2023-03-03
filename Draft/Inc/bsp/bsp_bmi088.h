@@ -18,7 +18,7 @@
 #define BMI088_ACCEL_TEMP_DATA_READY_BIT 2
 
 #define BMI088_LONG_DELAY_TIME 80
-#define BMI088_COM_WAIT_SENSOR_TIME 150
+#define BMI088_COM_WAIT_SENSOR_TIME 1
 
 #define BMI088_ACCEL_RANGE_3G
 #define BMI088_GYRO_RANGE_2000
@@ -38,6 +38,11 @@
 #define BMI088_ACCEL_NS_H() HAL_GPIO_WritePin(CS1_ACCEL_GPIO_Port, CS1_ACCEL_Pin, GPIO_PIN_SET)
 #define BMI088_GYRO_NS_L() HAL_GPIO_WritePin(CS1_GYRO_GPIO_Port, CS1_GYRO_Pin, GPIO_PIN_RESET)
 #define BMI088_GYRO_NS_H() HAL_GPIO_WritePin(CS1_GYRO_GPIO_Port, CS1_GYRO_Pin, GPIO_PIN_SET)
+
+extern uint8_t BMI088_help_read_write_byte(uint8_t txdata);
+extern void BMI088_help_write_single_reg(uint8_t reg, uint8_t data);
+extern void BMI088_help_read_single_reg(uint8_t reg, uint8_t *return_data);
+extern void BMI088_help_read_muli_reg(uint8_t reg, uint8_t *buf, uint8_t len);
 
 #define BMI088_accel_write_single_reg(reg, data)     \
     {                                                \
@@ -79,7 +84,7 @@
         BMI088_GYRO_NS_H();                              \
     }
 
-typedef  struct __packed BMI088_RAW_DATA
+typedef struct __packed BMI088_RAW_DATA
 {
     uint8_t status;
     int16_t accel[3];
@@ -117,8 +122,6 @@ enum
     BMI088_SELF_TEST_GYRO_ERROR = 0x40,
     BMI088_NO_SENSOR = 0xFF,
 };
-
-
 
 extern uint8_t BMI088_help_read_write_byte(uint8_t reg);
 extern uint8_t BMI088_init(void);

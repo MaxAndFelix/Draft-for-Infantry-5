@@ -56,7 +56,7 @@ extern IST8310_Real_Data_T ist8310_real_data;
 extern fp32 INS_angle[3];
 
 extern TIM_HandleTypeDef htim10;
-extern void Info_Proc(void const *pvParameters); // imu任务, 初始化 bmi088, ist8310, 计算欧拉角
+extern void Info_Proc(void *argument); // imu任务, 初始化 bmi088, ist8310, 计算欧拉角
 
 // extern void INS_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3], uint16_t *time_count);
 // extern void INS_set_cali_gyro(fp32 cali_scale[3], fp32 cali_offset[3]);

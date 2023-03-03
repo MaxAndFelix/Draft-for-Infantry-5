@@ -112,13 +112,13 @@ void AHRS_help_init(fp32 quat[4], fp32 accel[3], fp32 mag[3])
     quat[3] = 0.0f;
 }
 
-void Info_Proc(void const *pvParameters)
+void Info_Proc(void *argument)
 {
     osDelay(INS_TASK_INIT_TIME);
-    while (BMI088_init())
-        osDelay(100);
 
     while (IST8310_func_Init())
+        osDelay(100);
+    while (BMI088_init())
         osDelay(100);
 
     BMI088_func_read(bmi088_real_data.gyro, bmi088_real_data.accel, &bmi088_real_data.temp);
@@ -127,7 +127,6 @@ void Info_Proc(void const *pvParameters)
     AHRS_help_init(INS_quat, bmi088_real_data.accel, ist8310_real_data.mag);
 
     // get the handle of task
-
     Info_proc_local_handler = xTaskGetHandle(pcTaskGetName(NULL));
     // set spi frequency
     hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;

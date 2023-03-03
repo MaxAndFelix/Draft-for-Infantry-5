@@ -29,6 +29,7 @@
 #include "math.h"
 #include "pid.h"
 #include "info_proc.h"
+#include "bsp_usart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,12 +58,12 @@ const osThreadAttr_t defaultTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for weopen */
-osThreadId_t weopenHandle;
-const osThreadAttr_t weopen_attributes = {
-  .name = "weopen",
+/* Definitions for weapon */
+osThreadId_t weaponHandle;
+const osThreadAttr_t weapon_attributes = {
+  .name = "weapon",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for can_6020_pitch */
 osThreadId_t can_6020_pitchHandle;
@@ -92,9 +93,10 @@ const osThreadAttr_t info_proc_attributes = {
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
-void weopen_task(void *argument);
+void weapon_task(void *argument);
 void gimbal_pitch_task(void *argument);
 void communication_task(void *argument);
+void Info_Proc(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -128,8 +130,8 @@ void MX_FREERTOS_Init(void) {
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-  /* creation of weopen */
-  weopenHandle = osThreadNew(weopen_task, NULL, &weopen_attributes);
+  /* creation of weapon */
+  weaponHandle = osThreadNew(weapon_task, NULL, &weapon_attributes);
 
   /* creation of can_6020_pitch */
   can_6020_pitchHandle = osThreadNew(gimbal_pitch_task, NULL, &can_6020_pitch_attributes);
@@ -169,16 +171,16 @@ void StartDefaultTask(void *argument)
   /* USER CODE END StartDefaultTask */
 }
 
-/* USER CODE BEGIN Header_weopen_task */
+/* USER CODE BEGIN Header_weapon_task */
 /**
- * @brief Function implementing the weopen thread.
+ * @brief Function implementing the weapon thread.
  * @param argument: Not used
  * @retval None
  */
-/* USER CODE END Header_weopen_task */
-void weopen_task(void *argument)
+/* USER CODE END Header_weapon_task */
+void weapon_task(void *argument)
 {
-  /* USER CODE BEGIN weopen_task */
+  /* USER CODE BEGIN weapon_task */
   /* Infinite loop */
   for (uint8_t i = 0; i < 4; i++)
   {
@@ -214,7 +216,7 @@ void weopen_task(void *argument)
     }
     osDelay(1);
   }
-  /* USER CODE END weopen_task */
+  /* USER CODE END weapon_task */
 }
 
 /* USER CODE BEGIN Header_gimbal_pitch_task */
@@ -292,11 +294,21 @@ void communication_task(void *argument)
 
 /* USER CODE BEGIN Header_Info_Proc */
 /**
-* @brief Function implementing the info_proc thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the info_proc thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_Info_Proc */
+__weak void Info_Proc(void *argument)
+{
+  /* USER CODE BEGIN Info_Proc */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END Info_Proc */
+}
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */

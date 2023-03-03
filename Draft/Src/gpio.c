@@ -84,7 +84,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PCPin PCPin */
   GPIO_InitStruct.Pin = INT1_ACCEL_Pin|INT1_GYRO_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_EVT_FALLING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
@@ -96,8 +96,17 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(CS1_GYRO_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
   HAL_NVIC_SetPriority(EXTI3_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI4_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
 }
 

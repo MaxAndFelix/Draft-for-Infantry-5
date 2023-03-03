@@ -25,55 +25,23 @@ static uint8_t write_BMI088_gyro_reg_data_error[BMI088_WRITE_GYRO_REG_NUM][3] =
 
 };
 
-void HAL_delay_us(uint16_t us)
-{
-
-    uint32_t ticks = 0;
-    uint32_t told = 0;
-    uint32_t tnow = 0;
-    uint32_t tcnt = 0;
-    uint32_t reload = 0;
-    reload = SysTick->LOAD;
-    ticks = us * 168;
-    told = SysTick->VAL;
-    while (1)
-    {
-        tnow = SysTick->VAL;
-        if (tnow != told)
-        {
-            if (tnow < told)
-            {
-                tcnt += told - tnow;
-            }
-            else
-            {
-                tcnt += reload - tnow + told;
-            }
-            told = tnow;
-            if (tcnt >= ticks)
-            {
-                break;
-            }
-        }
-    }
-}
 uint8_t BMI088_help_read_write_byte(uint8_t txdata)
 {
     uint8_t rx_data;
     HAL_SPI_TransmitReceive(&hspi1, &txdata, &rx_data, 1, 1000);
     return rx_data;
 }
-static void BMI088_help_write_single_reg(uint8_t reg, uint8_t data)
+void BMI088_help_write_single_reg(uint8_t reg, uint8_t data)
 {
     BMI088_help_read_write_byte(reg);
     BMI088_help_read_write_byte(data);
 }
-static void BMI088_help_read_single_reg(uint8_t reg, uint8_t *return_data)
+void BMI088_help_read_single_reg(uint8_t reg, uint8_t *return_data)
 {
     BMI088_help_read_write_byte(reg | 0x80);
     *return_data = BMI088_help_read_write_byte(0x55);
 }
-static void BMI088_help_read_muli_reg(uint8_t reg, uint8_t *buf, uint8_t len)
+void BMI088_help_read_muli_reg(uint8_t reg, uint8_t *buf, uint8_t len)
 {
     BMI088_help_read_write_byte(reg | 0x80);
 
@@ -91,21 +59,22 @@ bool_t bmi088_accel_init(void)
     uint8_t res = 0;
     uint8_t write_reg_num = 0;
 
+    res = 0;
     // check commiunication
     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
-    HAL_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+    osDelay(BMI088_COM_WAIT_SENSOR_TIME);
     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
-    HAL_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+    osDelay(BMI088_COM_WAIT_SENSOR_TIME);
 
     // accel software reset
     BMI088_accel_write_single_reg(BMI088_ACC_SOFTRESET, BMI088_ACC_SOFTRESET_VALUE);
-    HAL_delay_us(BMI088_LONG_DELAY_TIME);
+    osDelay(BMI088_LONG_DELAY_TIME);
 
     // check commiunication is normal after reset
     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
-    HAL_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+    osDelay(BMI088_COM_WAIT_SENSOR_TIME);
     BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
-    HAL_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+    osDelay(BMI088_COM_WAIT_SENSOR_TIME);
 
     // check the "who am I"
     if (res != BMI088_ACC_CHIP_ID_VALUE)
@@ -118,10 +87,10 @@ bool_t bmi088_accel_init(void)
     {
 
         BMI088_accel_write_single_reg(write_BMI088_accel_reg_data_error[write_reg_num][0], write_BMI088_accel_reg_data_error[write_reg_num][1]);
-        HAL_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+        osDelay(BMI088_COM_WAIT_SENSOR_TIME);
 
         BMI088_accel_read_single_reg(write_BMI088_accel_reg_data_error[write_reg_num][0], res);
-        HAL_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+        osDelay(BMI088_COM_WAIT_SENSOR_TIME);
 
         if (res != write_BMI088_accel_reg_data_error[write_reg_num][1])
         {
@@ -138,18 +107,18 @@ bool_t bmi088_gyro_init(void)
 
     // check commiunication
     BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
-    HAL_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+    osDelay(BMI088_COM_WAIT_SENSOR_TIME);
     BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
-    HAL_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+    osDelay(BMI088_COM_WAIT_SENSOR_TIME);
 
     // reset the gyro sensor
     BMI088_gyro_write_single_reg(BMI088_GYRO_SOFTRESET, BMI088_GYRO_SOFTRESET_VALUE);
-    HAL_delay_us(BMI088_LONG_DELAY_TIME);
+    osDelay(BMI088_LONG_DELAY_TIME);
     // check commiunication is normal after reset
     BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
-    HAL_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+    osDelay(BMI088_COM_WAIT_SENSOR_TIME);
     BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
-    HAL_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+    osDelay(BMI088_COM_WAIT_SENSOR_TIME);
 
     // check the "who am I"
     if (res != BMI088_GYRO_CHIP_ID_VALUE)
@@ -162,10 +131,10 @@ bool_t bmi088_gyro_init(void)
     {
 
         BMI088_gyro_write_single_reg(write_BMI088_gyro_reg_data_error[write_reg_num][0], write_BMI088_gyro_reg_data_error[write_reg_num][1]);
-        HAL_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+        osDelay(BMI088_COM_WAIT_SENSOR_TIME);
 
         BMI088_gyro_read_single_reg(write_BMI088_gyro_reg_data_error[write_reg_num][0], res);
-        HAL_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+        osDelay(BMI088_COM_WAIT_SENSOR_TIME);
 
         if (res != write_BMI088_gyro_reg_data_error[write_reg_num][1])
         {
@@ -181,7 +150,6 @@ uint8_t BMI088_init(void)
     uint8_t error = BMI088_NO_ERROR;
     error |= bmi088_accel_init();
     error |= bmi088_gyro_init();
-
     return error;
 }
 

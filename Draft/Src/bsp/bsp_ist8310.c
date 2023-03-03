@@ -55,7 +55,7 @@ void HAL_Delay_us(uint16_t us)
 
 uint8_t IST8310_func_Init(void)
 {
-    static const uint8_t wait_time = 150;
+    static const uint8_t wait_time = 1;
     static const uint8_t sleepTime = 50;
     uint8_t res = 0;
     uint8_t writeNum = 0;
@@ -72,9 +72,11 @@ uint8_t IST8310_func_Init(void)
     for (writeNum = 0; writeNum < IST8310_WRITE_REG_NUM; writeNum++)
     {
         IST8310_help_IIC_write_single_reg(ist8310_write_reg_data_error[writeNum][0], ist8310_write_reg_data_error[writeNum][1]);
-        HAL_Delay_us(wait_time);
+        //HAL_Delay_us(wait_time);
+        osDelay(wait_time);
         res = IST8310_help_IIC_read_single_reg(ist8310_write_reg_data_error[writeNum][0]);
-        HAL_Delay_us(wait_time);
+        //HAL_Delay_us(wait_time);
+        osDelay(wait_time);
         if (res != ist8310_write_reg_data_error[writeNum][1])
         {
             return ist8310_write_reg_data_error[writeNum][2];
