@@ -31,6 +31,17 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "pid.h"
+#include "bsp_rc.h"
+#include "cmsis_os.h"
+#include "can.h"
+#include "dma.h"
+#include "i2c.h"
+#include "spi.h"
+#include "tim.h"
+#include "usart.h"
+#include "gpio.h"
+#include "remote_control.h"
 typedef struct
 {
     uint16_t can_id;		//ID��
@@ -38,39 +49,21 @@ typedef struct
     uint16_t rotor_angle;		//���ڵĽǶ�
     int16_t  rotor_speed;		//���ڵ�ת��
     int16_t  torque_current;		//ʵ��ת�ص���
-    uint8_t  temp;		//����¶�?
+    uint8_t  temp;		//����¶�?
 }moto_info_t;
 
-typedef struct _pid_struct_t
-{
-  float kp;
-  float ki;
-  float kd;
-  float i_max;
-  float out_max;
-  
-  float ref;      // target value
-  float fdb;      // feedback value  
-  float err[2];   // error and last error
 
-  float p_out;
-  float i_out;
-  float d_out;
-  float output;
-}pid_struct_t;
-//�궨��
-#define MOTOR_MAX_NUM 7		//??�������ֽ���
+#define MOTOR_MAX_NUM 7
 #define LIMIT_MIN_MAX(x,min,max) (x) = (((x)<=(min))?(min):(((x)>=(max))?(max):(x)))		//Խ���򸳱߽�??
 #define FEEDBACK_ID_BASE      0x201
 #define FEEDBACK_ID_BASE_6020 0x205
 #define CAN_CONTROL_ID_BASE   0x200
 #define CAN_CONTROL_ID_EXTEND 0x1ff
-//ȫ�ֱ���
 extern uint16_t can_cnt_1;
 extern uint16_t can_cnt_2;
-extern float target_speed[7];//ʵ��??������???320rpm
-extern moto_info_t motor_info[MOTOR_MAX_NUM];		//����??���?7����??
-extern pid_struct_t motor_pid[7];	
+extern float target_speed[7];
+extern moto_info_t motor_info[MOTOR_MAX_NUM];
+extern pid_type_def motor_pid[7];	
 extern uint8_t can_flag;
 extern double step; 
 extern double r;
@@ -106,26 +99,20 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define RSTN_IST8310_Pin GPIO_PIN_6
-#define RSTN_IST8310_GPIO_Port GPIOC
 #define IST8310_RST_Pin GPIO_PIN_6
 #define IST8310_RST_GPIO_Port GPIOG
-#define LED_R_Pin GPIO_PIN_12
-#define LED_R_GPIO_Port GPIOH
 #define IST8310_DRDY_Pin GPIO_PIN_3
 #define IST8310_DRDY_GPIO_Port GPIOG
-#define LED_G_Pin GPIO_PIN_11
-#define LED_G_GPIO_Port GPIOH
-#define LED_B_Pin GPIO_PIN_10
-#define LED_B_GPIO_Port GPIOH
+#define IST8310_DRDY_EXTI_IRQn EXTI3_IRQn
 #define CS1_ACCEL_Pin GPIO_PIN_4
 #define CS1_ACCEL_GPIO_Port GPIOA
 #define INT1_ACCEL_Pin GPIO_PIN_4
 #define INT1_ACCEL_GPIO_Port GPIOC
-#define INT1_GRYO_Pin GPIO_PIN_5
-#define INT1_GRYO_GPIO_Port GPIOC
+#define INT1_GYRO_Pin GPIO_PIN_5
+#define INT1_GYRO_GPIO_Port GPIOC
 #define CS1_GYRO_Pin GPIO_PIN_0
 #define CS1_GYRO_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

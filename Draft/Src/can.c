@@ -223,7 +223,7 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 void CAN_AlternateConfig()
 {
 
-  // ±¾º¯ÊıÓÃÓÚÅäÖÃcan±ØĞèµÄÅäÖÃ£º¹ıÂËÆ÷¡¢Ê¹ÄÜ¡¢¿ªÆô»Øµ÷
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½canï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ü¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½
   CAN_FilterTypeDef canfilterconfig;
 
   canfilterconfig.FilterActivation = CAN_FILTER_ENABLE;

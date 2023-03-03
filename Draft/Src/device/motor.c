@@ -15,12 +15,11 @@ uint16_t rc_tmp[5];
 // 此处代码非自动生成
 void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
 {
-    // Can 发送中断回调
-    if (hcan == &hcan2)
-    {
-        HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin);
-        // usart_printf("can2 transported\n");
-    }
+    // // Can 发送中断回调
+    // if (hcan == &hcan2)
+    // {
+        
+    // }
 }
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
@@ -68,7 +67,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         }
     }
 
-    HAL_GPIO_TogglePin(LED_G_GPIO_Port, LED_G_Pin);
+    //HAL_GPIO_TogglePin(LED_G_GPIO_Port, LED_G_Pin);
 }
 
 void CAN_cmd_chassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4)

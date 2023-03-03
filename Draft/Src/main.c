@@ -18,18 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
-#include "can.h"
-#include "dma.h"
-#include "i2c.h"
-#include "spi.h"
-#include "usart.h"
-#include "gpio.h"
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "bsp_rc.h"
-#include "remote_control.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,7 +46,7 @@ uint16_t can_cnt_1;
 uint16_t can_cnt_2;
 float target_speed[7];
 moto_info_t motor_info[MOTOR_MAX_NUM];		
-pid_struct_t motor_pid[7];	
+pid_type_def motor_pid[7];	
 uint8_t can_flag=0;
 double step=9158/660; 
 double r;
@@ -113,12 +106,15 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART3_UART_Init();
   MX_I2C3_Init();
+  MX_TIM5_Init();
+  MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
   CAN_AlternateConfig();
   remote_control_init();
   /* USER CODE END 2 */
 
-  /* Call init function for freertos objects (in freertos.c) */
+  /* Init scheduler */
+  osKernelInitialize();  /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();
 
   /* Start scheduler */

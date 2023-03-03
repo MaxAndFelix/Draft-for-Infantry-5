@@ -2,14 +2,7 @@
 #define __PID_H
 #include "main.h"
 #include "struct_typedef.h"
-void pid_init(pid_struct_t *pid,
-              float kp,
-              float ki,
-              float kd,
-              float i_max,
-              float out_max);
 
-float pid_calc(pid_struct_t *pid, float ref, float fdb);
 enum PID_MODE
 {
     PID_POSITION = 0,
@@ -18,22 +11,25 @@ enum PID_MODE
 typedef struct
 {
     uint8_t mode;
-    fp32 Kp;
-    fp32 Ki;
-    fp32 Kd;
+    fp32 kp;
+    fp32 ki;
+    fp32 kd;
 
-    fp32 max_out;
-    fp32 max_iout;
+    fp32 i_max;
+    fp32 out_max;
 
-    fp32 set;
+    fp32 ref;
     fp32 fdb;
 
     fp32 out;
-    fp32 Pout;
-    fp32 Iout;
-    fp32 Dout;
+    fp32 p_out;
+    fp32 i_out;
+    fp32 d_out;
     fp32 Dbuf[3];
-    fp32 error[3];
+    fp32 err[3];
 
 } pid_type_def;
+
+void pid_init(pid_type_def *pid, uint8_t mode, const fp32 PID[3], fp32 max_out, fp32 max_iout);
+float pid_calc(pid_type_def *pid, float ref, float fdb);
 #endif

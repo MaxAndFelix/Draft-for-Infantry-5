@@ -9,6 +9,10 @@
     "main.h": "c",
     "stm32f4xx_hal.h": "c",
     "stm32f4xx_hal_conf.h": "c",
-    "struct_typedef.h": "c"
+    "struct_typedef.h": "c",
+    "cmsis_os.h": "c",
+    "info_proc.h": "c",
+    "bsp_bmi088.h": "c",
+    "bsp_ist8310.h": "c"
   }
 }
