@@ -210,11 +210,11 @@ void gimbal_yaw_task(void const * argument)
       {
         if(rc_ctrl.rc.ch[0]>=364&&rc_ctrl.rc.ch[0]<=1684)
         {
-          target_speed[4] = -((rc_ctrl.rc.ch[0] - 1024) / 660 * 20); //60为转速 即 60rpm
+          target_speed[4] = -((rc_ctrl.rc.ch[0] - 1024) / 660 * 40); //60为转速 即 60rpm
           motor_info[4].set_voltage = pid_calc(&motor_pid[4], target_speed[4], motor_info[4].rotor_speed);
         }
       }
-      set_motor_voltage1(1, motor_info[4].set_voltage, motor_info[5].set_voltage, motor_info[6].set_voltage, 0);
+      //set_motor_voltage1(1, motor_info[4].set_voltage, motor_info[5].set_voltage, motor_info[6].set_voltage, 0);
     }
     osDelay(1);
   }
@@ -311,11 +311,11 @@ void chassis_task(void const * argument)
       motor_info[3].set_voltage = 0;
     }
     
-    set_motor_voltage(0,
-                      motor_info[0].set_voltage,
-                      motor_info[1].set_voltage,
-                      motor_info[2].set_voltage,
-                      motor_info[3].set_voltage);
+    // set_motor_voltage(0,
+    //                   motor_info[0].set_voltage,
+    //                   motor_info[1].set_voltage,
+    //                   motor_info[2].set_voltage,
+    //                   motor_info[3].set_voltage);
     osDelay(1);
   }
   /* USER CODE END chassis_task */
