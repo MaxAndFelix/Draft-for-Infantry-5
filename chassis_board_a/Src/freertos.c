@@ -286,10 +286,10 @@ void chassis_task(void const * argument)
 
         if (target_curl == 0)
         {
-          target_speed[0] = (0.707 * target_v * (sin_sita - cos_sita));
-          target_speed[1] = -(0.707 * target_v * (sin_sita + cos_sita));
-          target_speed[2] = -(0.707 * target_v * (sin_sita - cos_sita));
-          target_speed[3] = (0.707 * target_v * (sin_sita + cos_sita)); //保护不旋转只移动时的底盘功率上限
+          target_speed[0] = (0.707 * target_v * (sin_sita - cos_sita))/2;
+          target_speed[1] = -(0.707 * target_v * (sin_sita + cos_sita))/2;
+          target_speed[2] = -(0.707 * target_v * (sin_sita - cos_sita))/2;
+          target_speed[3] = (0.707 * target_v * (sin_sita + cos_sita))/2; //保护不旋转只移动时的底盘功率上限
         }
         else
         {
